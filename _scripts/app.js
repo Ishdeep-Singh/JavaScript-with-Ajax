@@ -15,6 +15,9 @@ const zipField = document.querySelector('#zip');
 const parkThumb = document.querySelector("#specials h2 img");
 const parkSection = document.querySelector('#specials');
 
+const parkName = document.querySelector("#specials h2 a");
+const parkDesc = document.querySelector('#specials p');
+
 const smartyUpdateUISuccess = function(data){
     const parsedData = JSON.parse(data);
     //console.log(parsedData);
@@ -26,7 +29,15 @@ const smartyUpdateUISuccess = function(data){
 };
 
 const parksUpdateUISuccess = function(data){
-    console.log(data);
+    const parsedData = JSON.parse(data);
+    console.log(parsedData);
+
+    const number = Math.floor(Math.random() * parsedData.data.length);
+
+    parkName.textContent = parsedData.data[number].fullName;
+    parkName.href = parsedData.data[number].url;
+    parkDesc.textContent = parsedData.data[number].description;
+
     parkThumb.src = "https://www.nps.gov/theme/assets/dist/images/branding/logo.png";
     parkSection.classList.remove('hidden');
 }
@@ -67,8 +78,12 @@ const checkCompletion = function(){
 }
 
 //createRequest(smartyUrl);
-createRequest(parksUrl, parksUpdateUISuccess, parksUpdateUIError);
+//createRequest(parksUrl, parksUpdateUISuccess, parksUpdateUIError);
 
 addressField.addEventListener('blur', checkCompletion);
 cityField.addEventListener('blur', checkCompletion);
 stateField.addEventListener('blur', checkCompletion);
+
+window.addEventListener('DOMContentLoaded', () => {
+    createRequest(parksUrl, parksUpdateUISuccess, parksUpdateUIError);
+});
