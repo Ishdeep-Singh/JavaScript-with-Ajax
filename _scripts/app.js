@@ -12,27 +12,46 @@ const stateField = document.querySelector('#state');
 // const $zipField = $('#zip');
 const zipField = document.querySelector('#zip');
 
-const updateUISuccess = function(data){
-    console.log(data);
+const parkThumb = document.querySelector("#specials h2 img");
+const parkSection = document.querySelector('#specials');
+
+const smartyUpdateUISuccess = function(data){
+    const parsedData = JSON.parse(data);
+    //console.log(parsedData);
+    const zip = parsedData[0].components.zipcode;
+    const plus4 = parsedData[0].components.plus4_code;
+    //console.log(zip+'-'+plus4);
+
+    zipField.value = zip+'-'+plus4;
 };
 
-const updateUIError = function(error){
+const parksUpdateUISuccess = function(data){
+    console.log(data);
+    parkThumb.src = "https://www.nps.gov/theme/assets/dist/images/branding/logo.png";
+    parkSection.classList.remove('hidden');
+}
+
+const smartyUpdateUIError = function(error){
     console.log(error);
 };
 
-const responseMethod = function(httpRequest){
+const parksUpdateUIError = function(error){
+    console.log(error);
+};
+
+const responseMethod = function(httpRequest, succeed, fail){
     if(httpRequest.readyState === 4){
         if(httpRequest.status === 200){
-            updateUISuccess(httpRequest.responseText);
+            succeed(httpRequest.responseText);
         } else {
-            updateUIError(httpRequest.status + ': ' + httpRequest.responseText);
+            fail(httpRequest.status + ': ' + httpRequest.responseText);
         }
     }
 };
 
-const createRequest = function(url){
+const createRequest = function(url, succeed, fail){
     const httpRequest = new XMLHttpRequest(url);
-    httpRequest.addEventListener('readystatechange', (url) => responseMethod(httpRequest));
+    httpRequest.addEventListener('readystatechange', (url) => responseMethod(httpRequest, succeed, fail));
     httpRequest.open('GET', url);
     httpRequest.send();
 };
@@ -43,12 +62,12 @@ const checkCompletion = function(){
         stateField.value !== ''){
             const requestUrl = smartyUrl + '&street=' + addressField.value + '&city=' +cityField.value + '&state=' + stateField.value;
 
-            createRequest(requestUrl);
+            createRequest(requestUrl, smartyUpdateUISuccess, smartyUpdateUIError);
         }
 }
 
 //createRequest(smartyUrl);
-//createRequest(parksUrl);
+createRequest(parksUrl, parksUpdateUISuccess, parksUpdateUIError);
 
 addressField.addEventListener('blur', checkCompletion);
 cityField.addEventListener('blur', checkCompletion);
